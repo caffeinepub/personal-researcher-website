@@ -1,0 +1,125 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Owner-gated admin editing UI for researcher profile content",
+  "requirements": [
+    {
+      "id": "REQ-2",
+      "summary": "Add an authenticated owner-only edit UI on the homepage to update profile, interests, publications (with optional uploads), and contact info using React Query mutations with query invalidation.",
+      "acceptanceCriteria": [
+        "When not logged in, the UI offers a clear way to sign in with Internet Identity before editing.",
+        "When logged in but not the owner, editing controls are hidden/disabled and the UI communicates lack of permission.",
+        "When logged in as the owner, the UI provides forms to update profile fields and upload/replace an optional photo.",
+        "When logged in as the owner, the UI provides a form to add research interests.",
+        "When logged in as the owner, the UI provides a form to add publications including optional external link and optional PDF upload.",
+        "When logged in as the owner, the UI provides a form to set contact email and affiliation, and shows backend validation errors (e.g., invalid email) in a user-friendly way.",
+        "After each successful mutation, the corresponding section on the homepage updates without a full page reload."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/LoginButton.tsx",
+          "operation": "create",
+          "description": "Create a Login/Logout button using the existing useInternetIdentity hook and React Query’s queryClient.clear() on logout to clear cached data. Use English UI text. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useOwnerStatus.ts",
+          "operation": "create",
+          "description": "Add React Query hook(s) to query backend isOwner for the current caller and expose a stable owner-state for UI gating (e.g., loading/authenticated/not-owner/owner). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useMutations.ts",
+          "operation": "create",
+          "description": "Add React Query mutations for setProfile (including optional photo), addResearchInterest, addPublication (including optional PDF), and setContactInfo, and invalidate the corresponding queries (profile, researchInterests, publications, contactInfo) on success. For uploads, use the blob-storage ExternalBlob helper (e.g., ExternalBlob.fromBytes and upload progress) as required by the backend types. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/AdminEditPanel.tsx",
+          "operation": "create",
+          "description": "Create an owner-gated edit panel (e.g., dialog/drawer/accordion) that composes shadcn/ui primitives to host edit forms for profile, interests, publications, and contact info, with clear empty/loading/error states and English text. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/ProfileEditForm.tsx",
+          "operation": "create",
+          "description": "Implement profile edit form (name, biography, optional photo file input) that calls the setProfile mutation. Use blob-storage ExternalBlob to wrap selected file bytes for upload and preview using getDirectURL where applicable. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/ResearchInterestsEditor.tsx",
+          "operation": "create",
+          "description": "Implement research interests editor to add interests using addResearchInterest mutation, showing success/error feedback, and relying on query invalidation to refresh the homepage list. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/PublicationsEditor.tsx",
+          "operation": "create",
+          "description": "Implement publications editor to add publications (title, description, optional link, optional PDF file input) using addPublication mutation. Use blob-storage ExternalBlob for PDF upload and show user-friendly mutation errors. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/ContactInfoEditForm.tsx",
+          "operation": "create",
+          "description": "Implement contact info edit form (email, affiliation) calling setContactInfo mutation and render backend validation errors in a user-friendly way (no raw traps). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Wire authentication and editing entry point into the existing header: add the new LoginButton and an Edit control that opens the AdminEditPanel when the caller is the owner; when authenticated but not owner, hide/disable edit actions and show a clear ‘no permission’ message. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Wire the AdminEditPanel into the homepage render tree so it is reachable from the Header Edit control and shares the same data sources (useProfile/useResearchInterests/usePublications/useContactInfo) that refresh via query invalidation after mutations. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Keep existing public queries intact and add any minimal supporting query (if needed) for owner gating (prefer a dedicated hook file, but allow re-export here for consistency). Ensure queries remain enabled/disabled appropriately based on actor readiness. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add owner-only UI controls to remove interests/publications and to remove/replace uploaded photo/PDF blobs, updating the homepage via React Query invalidation.",
+      "acceptanceCriteria": [
+        "Owner can delete a research interest and it no longer appears on the homepage.",
+        "Owner can delete a publication and it no longer appears on the homepage.",
+        "Owner can replace or remove the profile photo; the rendered hero photo updates accordingly.",
+        "Owner can replace or remove a publication PDF; the rendered publication card updates accordingly.",
+        "All new write methods are protected by the same owner-only authorization as existing write methods."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useMutations.ts",
+          "operation": "modify",
+          "description": "Add React Query mutations for deleteResearchInterest, deletePublication, updatePublication, and profile/publication blob removal flows (setProfile with null photo; updatePublication with null pdf), and invalidate researchInterests/publications/profile queries on success. Use blob-storage ExternalBlob helpers for replacement uploads and rely on backend’s ExternalBlob for rendering via getDirectURL. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/ProfileEditForm.tsx",
+          "operation": "modify",
+          "description": "Add owner controls to remove the current profile photo (submitting null) and replace it via file upload; ensure the HeroSection reflects changes via profile query invalidation. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/ResearchInterestsEditor.tsx",
+          "operation": "modify",
+          "description": "Add per-interest delete controls calling deleteResearchInterest and ensure the research interests section updates immediately via query invalidation. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/PublicationsEditor.tsx",
+          "operation": "modify",
+          "description": "Add per-publication delete controls (deletePublication) and PDF remove/replace controls (updatePublication with null/new ExternalBlob). Ensure the PublicationsSection updates via query invalidation. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/PublicationsSection.tsx",
+          "operation": "modify",
+          "description": "Ensure publication cards correctly reflect removed/replaced PDFs (e.g., hide download button when pdf is absent) after query invalidation-driven updates; keep public read-only browsing unchanged. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/HeroSection.tsx",
+          "operation": "modify",
+          "description": "Ensure hero photo rendering correctly reflects removed/replaced photo blobs (fallback when none) after profile query invalidation-driven updates; keep public read-only browsing unchanged. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/AdminEditPanel.tsx",
+          "operation": "modify",
+          "description": "Expose the new maintenance actions in the admin panel (delete interest/publication, remove/replace photo/PDF) and ensure actions are only visible/enabled for owner. Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

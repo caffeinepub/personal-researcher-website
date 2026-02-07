@@ -1,0 +1,82 @@
+{
+  "kind": "build_request",
+  "title": "Add editable admin UI for researcher name, publications, interests, and contact info",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Add canister-level access control so only a single owner (Internet Identity principal) can modify profile data (setProfile, addResearchInterest, addPublication, setContactInfo, clearData). The first successful write should set the owner if none exists; subsequent writes must reject non-owner callers with a clear error message. Add a query method to check whether the current caller is the owner (for frontend gating).",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "how to add my name and publications etc"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If no owner is set yet, the first successful call to any write method sets the owner principal to that caller.",
+        "After an owner is set, calls to setProfile/addResearchInterest/addPublication/setContactInfo/clearData by any other principal trap/reject with an authorization error.",
+        "A new query method (e.g., isOwner) returns true for the owner principal and false otherwise.",
+        "Read-only query methods (getProfile/getResearchInterests/getPublications/getPublication/getContactInfo) remain publicly accessible."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement an authenticated \"Edit\" experience in the frontend that lets the owner add/update: (1) profile name, biography, and optional photo upload; (2) research interests; (3) publications (title, description, optional external link, optional PDF upload); (4) contact info (email, affiliation). Use React Query mutations and invalidate the existing queries (profile, researchInterests, publications, contactInfo) after successful updates so the homepage reflects changes immediately.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "how to add my name and publications etc"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When not logged in, the UI offers a clear way to sign in with Internet Identity before editing.",
+        "When logged in but not the owner, editing controls are hidden/disabled and the UI communicates lack of permission.",
+        "When logged in as the owner, the UI provides forms to update profile fields and upload/replace an optional photo.",
+        "When logged in as the owner, the UI provides a form to add research interests.",
+        "When logged in as the owner, the UI provides a form to add publications including optional external link and optional PDF upload.",
+        "When logged in as the owner, the UI provides a form to set contact email and affiliation, and shows backend validation errors (e.g., invalid email) in a user-friendly way.",
+        "After each successful mutation, the corresponding section on the homepage updates without a full page reload."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add basic content management capabilities needed for ongoing maintenance: allow the owner to remove individual research interests and publications, and to delete/replace uploaded blobs (photo/PDF) from the UI. Add the necessary backend methods (deleteResearchInterest, deletePublication, and updatePublication/updateProfile variants as needed) and connect them to the frontend.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "how to add my name and publications etc"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Owner can delete a research interest and it no longer appears on the homepage.",
+        "Owner can delete a publication and it no longer appears on the homepage.",
+        "Owner can replace or remove the profile photo; the rendered hero photo updates accordingly.",
+        "Owner can replace or remove a publication PDF; the rendered publication card updates accordingly.",
+        "All new write methods are protected by the same owner-only authorization as existing write methods."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any code in frontend/src/components/ui; compose them instead.",
+    "Use English for all user-facing UI text."
+  ],
+  "nonGoals": [
+    "Adding third-party authentication providers beyond Internet Identity.",
+    "Adding external databases or off-chain storage.",
+    "Building a multi-user editing system with roles/permissions beyond a single owner model."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

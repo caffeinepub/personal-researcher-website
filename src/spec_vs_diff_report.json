@@ -1,0 +1,82 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-07T14:04:58.264Z",
+  "summary": "The diff adds a substantial admin editing UI with React Query mutations and introduces an owner-check query plus an owner assertion in the backend. However, it violates BuildRequest constraints by modifying forbidden frontend hook files, and several required backend/UI behaviors cannot be confirmed from the truncated backend diff (owner-protection coverage, required CRUD methods, and user-friendly validation error display).",
+  "missing_requirements": [
+    {
+      "id": "REQ-1",
+      "requirement": "After an owner is set, calls to setProfile/addResearchInterest/addPublication/setContactInfo/clearData by any other principal must reject with an authorization error; first successful write sets owner if none exists; read-only queries remain public.",
+      "reason": "The backend diff shows `owner`, `assertOwner`, `setProfile`, and `isOwner`, but the file is truncated before showing whether all other write methods (addResearchInterest/addPublication/setContactInfo/clearData and any new write methods) call `assertOwner`, and whether read-only queries are kept publicly accessible.",
+      "evidence": [
+        "backend/main.mo (truncated; only shows assertOwner, isOwner, setProfile, start of getProfile)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "When logged in as the owner, the UI shows backend validation errors (e.g., invalid email) in a user-friendly way.",
+      "reason": "`ContactInfoEditForm` submits via mutation but does not display field-level or inline backend validation errors; it relies on mutation/toast error handling (and the mutation file is truncated, so full behavior is unclear).",
+      "evidence": [
+        "frontend/src/components/admin/ContactInfoEditForm.tsx",
+        "frontend/src/hooks/useMutations.ts (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Add backend methods for deleteResearchInterest, deletePublication, and updatePublication/updateProfile variants as needed; protect all new write methods with the same owner-only authorization.",
+      "reason": "Frontend calls `actor.deleteResearchInterest`, `actor.deletePublication`, and `actor.updatePublication`, but the backend diff is truncated and does not show these methods exist or are owner-protected.",
+      "evidence": [
+        "frontend/src/hooks/useMutations.ts (calls deleteResearchInterest/deletePublication/updatePublication)",
+        "backend/main.mo (truncated; does not show these method implementations)"
+      ]
+    },
+    {
+      "requirement": "Constraint: Do not modify files under frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any code in frontend/src/components/ui; compose them instead.",
+      "reason": "The diff modifies `frontend/src/hooks/useActor.ts` and `frontend/src/hooks/useInternetIdentity.ts`, which is explicitly disallowed by the BuildRequest constraints.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts (modified)",
+        "frontend/src/hooks/useInternetIdentity.ts (modified/truncated)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Secret-token-based access control initialization via URL param `caffeineAdminToken` and call to `_initializeAccessControlWithSecret` when creating the actor.",
+      "reason": "BuildRequest specifies an owner model based on Internet Identity principal (first writer becomes owner) and explicitly lists non-goals including additional auth mechanisms; the admin token mechanism is not requested and changes the authentication/control surface area.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts (getSecretParameter('caffeineAdminToken'); actor._initializeAccessControlWithSecret(adminToken))",
+        "frontend/src/utils/urlParams.ts (session/URL parameter persistence utilities; comments reference admin tokens)",
+        "backend/main.mo (imports authorization/access-control and MixinAuthorization; user profile methods tied to authorization system)"
+      ]
+    },
+    {
+      "description": "Added generic URL/session parameter management utilities (including persistence) that are not required for the owner-only edit UI.",
+      "reason": "No requirement calls for URL parameter parsing/persistence; this appears introduced to support the admin-token flow rather than the specified owner model.",
+      "evidence": [
+        "frontend/src/utils/urlParams.ts"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/HeroSection.tsx",
+    "frontend/src/components/LoginButton.tsx",
+    "frontend/src/components/admin/AdminEditPanel.tsx",
+    "frontend/src/components/admin/ContactInfoEditForm.tsx",
+    "frontend/src/components/admin/ProfileEditForm.tsx",
+    "frontend/src/components/admin/PublicationsEditor.tsx",
+    "frontend/src/components/admin/ResearchInterestsEditor.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useMutations.ts",
+    "frontend/src/hooks/useOwnerStatus.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/utils/urlParams.ts",
+    "project_state.json"
+  ]
+}

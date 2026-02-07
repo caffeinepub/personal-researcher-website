@@ -1,0 +1,20 @@
+{
+  "frontend/src/App.tsx": "Main application component that wraps the app with QueryClientProvider, ThemeProvider, and renders the HomePage with toast notifications.",
+  "frontend/src/pages/HomePage.tsx": "Main page component that fetches all data and orchestrates the display of hero, research interests, publications, and contact sections.",
+  "frontend/src/components/Header.tsx": "Sticky header with navigation, theme toggle, login button, and owner-only edit button with permission messaging.",
+  "frontend/src/components/HeroSection.tsx": "Hero section displaying researcher's photo, name, and biography with loading states and fallback UI for missing profile.",
+  "frontend/src/components/ResearchInterestsSection.tsx": "Section displaying research interests as styled badges with icon and descriptive header.",
+  "frontend/src/components/PublicationsSection.tsx": "Section displaying publication cards with titles, descriptions, and optional links/PDFs that update via query invalidation.",
+  "frontend/src/components/ContactSection.tsx": "Contact section displaying email and institutional affiliation in card format with icons.",
+  "frontend/src/components/Footer.tsx": "Footer component with copyright notice and caffeine.ai attribution with heart icon.",
+  "frontend/src/hooks/useQueries.ts": "Custom React Query hooks for fetching profile, research interests, publications, contact information, and user profile from the backend.",
+  "frontend/src/index.css": "Global styles with OKLCH color system featuring an academic blue-tinted palette for both light and dark modes.",
+  "frontend/src/components/LoginButton.tsx": "Login/logout button component using Internet Identity with loading states and query cache clearing on logout.",
+  "frontend/src/hooks/useOwnerStatus.ts": "React Query hook that checks if the current authenticated user is the portfolio owner.",
+  "frontend/src/hooks/useMutations.ts": "React Query mutations for all write operations (profile, interests, publications, contact) with query invalidation and toast notifications.",
+  "frontend/src/components/admin/AdminEditPanel.tsx": "Owner-gated admin panel with tabbed interface for editing profile, interests, publications, and contact information.",
+  "frontend/src/components/admin/ProfileEditForm.tsx": "Form component for editing profile name, biography, and photo with upload/remove functionality.",
+  "frontend/src/components/admin/ResearchInterestsEditor.tsx": "Component for adding and deleting research interests with confirmation dialogs.",
+  "frontend/src/components/admin/PublicationsEditor.tsx": "Component for adding, editing, and deleting publications with PDF upload/replace/remove functionality.",
+  "frontend/src/components/admin/ContactInfoEditForm.tsx": "Form component for editing email and institutional affiliation with backend validation error handling."
+}
