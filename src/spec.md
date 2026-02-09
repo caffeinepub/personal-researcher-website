@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Let the site owner securely edit the researcher profile (name/bio/photo), research interests, publications (including links/PDFs), and contact info via an authenticated admin UI.
+**Goal:** Let authenticated non-owner users view and update their own personal info (UserProfile name) via a dedicated Personal Info UI, using existing backend endpoints.
 
 **Planned changes:**
-- Add canister-level single-owner authorization (Internet Identity principal) for all write methods; first successful write sets the owner; non-owner writes are rejected with a clear error.
-- Add a public query method to check whether the current caller is the owner for frontend gating; keep existing read-only queries publicly accessible.
-- Build an authenticated frontend “Edit” experience using Internet Identity login and React Query mutations to add/update profile (name, bio, optional photo), research interests, publications (title, description, optional link, optional PDF), and contact info (email, affiliation).
-- Add owner-only content management for ongoing maintenance: delete individual research interests and publications, and remove/replace uploaded blobs (profile photo, publication PDF), with corresponding backend methods and frontend wiring.
-- After successful edits, invalidate relevant queries so the homepage updates immediately without a full page reload and display validation/authorization errors in a user-friendly way.
+- Add a Personal Info editor UI for authenticated users to view the currently saved name (or empty state) and submit updates.
+- Implement React Query hooks to fetch the caller’s UserProfile and to mutate it via saveCallerUserProfile, invalidating the existing `['currentUserProfile']` cache key on success.
+- Add a non-owner authenticated entry point (e.g., in the header near login) to open the Personal Info editor, while keeping the owner-only Admin Edit panel behavior unchanged.
+- Show success and error feedback via the existing toast system, including clear handling of authorization errors.
 
-**User-visible outcome:** The owner can sign in with Internet Identity to manage the full researcher profile (including uploads, updates, and deletions), while non-owners can still view the public profile but cannot access editing controls.
+**User-visible outcome:** Logged-in non-owner users can open a Personal Info screen, see their current name, update it, and immediately see the updated name reflected in the UI without a full page refresh; errors (including authorization failures) are shown as clear messages.

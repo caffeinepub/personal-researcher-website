@@ -1,82 +1,85 @@
 {
   "kind": "build_request",
-  "title": "Add editable admin UI for researcher name, publications, interests, and contact info",
+  "title": "Add UI to update logged-in user's personal info (UserProfile)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add canister-level access control so only a single owner (Internet Identity principal) can modify profile data (setProfile, addResearchInterest, addPublication, setContactInfo, clearData). The first successful write should set the owner if none exists; subsequent writes must reject non-owner callers with a clear error message. Add a query method to check whether the current caller is the owner (for frontend gating).",
-      "target": "backend",
+      "text": "Add a logged-in user experience that allows an authenticated (non-owner) user to view and update their own personal information stored as the backend UserProfile (currently: name) by calling getCallerUserProfile and saveCallerUserProfile.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "how to add my name and publications etc"
+          "update personal info"
         ]
       },
       "acceptanceCriteria": [
-        "If no owner is set yet, the first successful call to any write method sets the owner principal to that caller.",
-        "After an owner is set, calls to setProfile/addResearchInterest/addPublication/setContactInfo/clearData by any other principal trap/reject with an authorization error.",
-        "A new query method (e.g., isOwner) returns true for the owner principal and false otherwise.",
-        "Read-only query methods (getProfile/getResearchInterests/getPublications/getPublication/getContactInfo) remain publicly accessible."
+        "When a user is authenticated, they can open a Personal Info UI and see their current saved name (or an empty value if none exists yet).",
+        "Submitting the form calls the backend saveCallerUserProfile with the updated name and shows a success toast on completion.",
+        "After saving, subsequent reads (and any UI displaying the current user profile) reflect the updated name without a full page refresh.",
+        "If the backend rejects the call with an authorization error, the UI shows a clear error toast/message and does not crash."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement an authenticated \"Edit\" experience in the frontend that lets the owner add/update: (1) profile name, biography, and optional photo upload; (2) research interests; (3) publications (title, description, optional external link, optional PDF upload); (4) contact info (email, affiliation). Use React Query mutations and invalidate the existing queries (profile, researchInterests, publications, contactInfo) after successful updates so the homepage reflects changes immediately.",
+      "text": "Implement React Query hooks to fetch and mutate the caller's UserProfile, including cache invalidation for the existing query key used for the current user profile.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "how to add my name and publications etc"
+          "update personal info"
         ]
       },
       "acceptanceCriteria": [
-        "When not logged in, the UI offers a clear way to sign in with Internet Identity before editing.",
-        "When logged in but not the owner, editing controls are hidden/disabled and the UI communicates lack of permission.",
-        "When logged in as the owner, the UI provides forms to update profile fields and upload/replace an optional photo.",
-        "When logged in as the owner, the UI provides a form to add research interests.",
-        "When logged in as the owner, the UI provides a form to add publications including optional external link and optional PDF upload.",
-        "When logged in as the owner, the UI provides a form to set contact email and affiliation, and shows backend validation errors (e.g., invalid email) in a user-friendly way.",
-        "After each successful mutation, the corresponding section on the homepage updates without a full page reload."
+        "A mutation hook exists that calls saveCallerUserProfile and invalidates the ['currentUserProfile'] query on success.",
+        "Errors from the mutation are surfaced to the user via the existing toast system (sonner)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add basic content management capabilities needed for ongoing maintenance: allow the owner to remove individual research interests and publications, and to delete/replace uploaded blobs (photo/PDF) from the UI. Add the necessary backend methods (deleteResearchInterest, deletePublication, and updatePublication/updateProfile variants as needed) and connect them to the frontend.",
-      "target": "both",
+      "text": "Expose entry points in the existing UI to access the Personal Info editor for authenticated users who are not the portfolio owner, without granting access to the owner-only Admin Edit panel.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "how to add my name and publications etc"
+          "update personal info"
         ]
       },
       "acceptanceCriteria": [
-        "Owner can delete a research interest and it no longer appears on the homepage.",
-        "Owner can delete a publication and it no longer appears on the homepage.",
-        "Owner can replace or remove the profile photo; the rendered hero photo updates accordingly.",
-        "Owner can replace or remove a publication PDF; the rendered publication card updates accordingly.",
-        "All new write methods are protected by the same owner-only authorization as existing write methods."
+        "When logged in as a non-owner, the user has a visible way to open the Personal Info editor (e.g., from the header near the login button).",
+        "When logged out, the Personal Info editor entry point is hidden or disabled.",
+        "The existing owner-only Edit panel behavior remains unchanged (only owners see the Edit button and can open AdminEditPanel)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any code in frontend/src/components/ui; compose them instead.",
-    "Use English for all user-facing UI text."
+    "Do not edit files under frontend/src/components/ui (compose shadcn components instead).",
+    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths).",
+    "Backend must remain a single-actor Motoko canister with all logic in backend/main.mo; only add migration if state schema changes are required."
   ],
   "nonGoals": [
-    "Adding third-party authentication providers beyond Internet Identity.",
-    "Adding external databases or off-chain storage.",
-    "Building a multi-user editing system with roles/permissions beyond a single owner model."
+    "Do not change the researcher portfolio owner-editable fields (profile, interests, publications, contact info) or their access control behavior.",
+    "Do not add third-party authentication (Internet Identity only).",
+    "Do not add additional personal info fields beyond what the backend UserProfile currently supports (name) unless explicitly requested."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

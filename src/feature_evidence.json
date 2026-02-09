@@ -2,20 +2,31 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-implement-an-authenticated-edit-experience-in-the-frontend-that-lets-the-owner-add-update-1-profile-name-biography-and-optional-photo-upload-2-research-interests-3-publications-title-description-optional-external-link-optional-pdf-upload-4-contact-info-email-affiliation-use-react-query-mutations-and-invalidate-the-existing-queries-profile-researchinterests-publications-contactinfo-after-successful-updates-so-the-homepage-reflects-changes-immediately",
-      "featureTitle": "Implement an authenticated \"Edit\" experience in the frontend that lets the owner add/update: (1) profile name, biography, and optional photo upload; (2) research interests; (3) publications (title, description, optional external link, optional PDF upload); (4) contact info (email, affiliation). Use React Query mutations and invalidate the existing queries (profile, researchInterests, publications, contactInfo) after successful updates so the homepage reflects changes immediately.",
+      "featureId": "feature-add-a-logged-in-user-experience-that-allows-an-authenticated-non-owner-user-to-view-and-update-their-own-personal-information-stored-as-the-backend-userprofile-currently-name-by-calling-getcalleruserprofile-and-savecalleruserprofile",
+      "featureTitle": "Add a logged-in user experience that allows an authenticated (non-owner) user to view and update their own personal information stored as the backend UserProfile (currently: name) by calling getCallerUserProfile and saveCallerUserProfile.",
       "files": [
         "frontend/src/components/Header.tsx",
-        "frontend/src/components/LoginButton.tsx",
-        "frontend/src/components/admin/AdminEditPanel.tsx",
-        "frontend/src/components/admin/ContactInfoEditForm.tsx",
-        "frontend/src/components/admin/ProfileEditForm.tsx",
-        "frontend/src/components/admin/PublicationsEditor.tsx",
-        "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-        "frontend/src/hooks/useMutations.ts",
-        "frontend/src/hooks/useOwnerStatus.ts",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/HomePage.tsx"
+        "frontend/src/components/user/PersonalInfoEditorSheet.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-react-query-hooks-to-fetch-and-mutate-the-caller-s-userprofile-including-cache-invalidation-for-the-existing-query-key-used-for-the-current-user-profile",
+      "featureTitle": "Implement React Query hooks to fetch and mutate the caller's UserProfile, including cache invalidation for the existing query key used for the current user profile.",
+      "files": [
+        "frontend/src/hooks/useMutations.ts"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -32,15 +43,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-basic-content-management-capabilities-needed-for-ongoing-maintenance-allow-the-owner-to-remove-individual-research-interests-and-publications-and-to-delete-replace-uploaded-blobs-photo-pdf-from-the-ui-add-the-necessary-backend-methods-deleteresearchinterest-deletepublication-and-updatepublication-updateprofile-variants-as-needed-and-connect-them-to-the-frontend",
-      "featureTitle": "Add basic content management capabilities needed for ongoing maintenance: allow the owner to remove individual research interests and publications, and to delete/replace uploaded blobs (photo/PDF) from the UI. Add the necessary backend methods (deleteResearchInterest, deletePublication, and updatePublication/updateProfile variants as needed) and connect them to the frontend.",
+      "featureId": "feature-expose-entry-points-in-the-existing-ui-to-access-the-personal-info-editor-for-authenticated-users-who-are-not-the-portfolio-owner-without-granting-access-to-the-owner-only-admin-edit-panel",
+      "featureTitle": "Expose entry points in the existing UI to access the Personal Info editor for authenticated users who are not the portfolio owner, without granting access to the owner-only Admin Edit panel.",
       "files": [
-        "frontend/src/components/HeroSection.tsx",
-        "frontend/src/components/admin/AdminEditPanel.tsx",
-        "frontend/src/components/admin/ProfileEditForm.tsx",
-        "frontend/src/components/admin/PublicationsEditor.tsx",
-        "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-        "frontend/src/hooks/useMutations.ts"
+        "frontend/src/components/Header.tsx",
+        "frontend/src/components/user/PersonalInfoEditorSheet.tsx"
       ],
       "components": [
         "blob-storage@4.0.0",

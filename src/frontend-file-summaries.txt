@@ -1,7 +1,7 @@
 {
   "frontend/src/App.tsx": "Main application component that wraps the app with QueryClientProvider, ThemeProvider, and renders the HomePage with toast notifications.",
   "frontend/src/pages/HomePage.tsx": "Main page component that fetches all data and orchestrates the display of hero, research interests, publications, and contact sections.",
-  "frontend/src/components/Header.tsx": "Sticky header with navigation, theme toggle, login button, and owner-only edit button with permission messaging.",
+  "frontend/src/components/Header.tsx": "Sticky header with navigation, theme toggle, login button, owner-only edit button, and new personal info button for authenticated non-owner users that displays their name when available.",
   "frontend/src/components/HeroSection.tsx": "Hero section displaying researcher's photo, name, and biography with loading states and fallback UI for missing profile.",
   "frontend/src/components/ResearchInterestsSection.tsx": "Section displaying research interests as styled badges with icon and descriptive header.",
   "frontend/src/components/PublicationsSection.tsx": "Section displaying publication cards with titles, descriptions, and optional links/PDFs that update via query invalidation.",
@@ -11,10 +11,11 @@
   "frontend/src/index.css": "Global styles with OKLCH color system featuring an academic blue-tinted palette for both light and dark modes.",
   "frontend/src/components/LoginButton.tsx": "Login/logout button component using Internet Identity with loading states and query cache clearing on logout.",
   "frontend/src/hooks/useOwnerStatus.ts": "React Query hook that checks if the current authenticated user is the portfolio owner.",
-  "frontend/src/hooks/useMutations.ts": "React Query mutations for all write operations (profile, interests, publications, contact) with query invalidation and toast notifications.",
+  "frontend/src/hooks/useMutations.ts": "React Query mutations for all write operations including profile, interests, publications, contact info, and the new useSaveCallerUserProfile hook with query invalidation and toast notifications.",
   "frontend/src/components/admin/AdminEditPanel.tsx": "Owner-gated admin panel with tabbed interface for editing profile, interests, publications, and contact information.",
   "frontend/src/components/admin/ProfileEditForm.tsx": "Form component for editing profile name, biography, and photo with upload/remove functionality.",
   "frontend/src/components/admin/ResearchInterestsEditor.tsx": "Component for adding and deleting research interests with confirmation dialogs.",
   "frontend/src/components/admin/PublicationsEditor.tsx": "Component for adding, editing, and deleting publications with PDF upload/replace/remove functionality.",
-  "frontend/src/components/admin/ContactInfoEditForm.tsx": "Form component for editing email and institutional affiliation with backend validation error handling."
+  "frontend/src/components/admin/ContactInfoEditForm.tsx": "Form component for editing email and institutional affiliation with backend validation error handling.",
+  "frontend/src/components/user/PersonalInfoEditorSheet.tsx": "Sheet component for authenticated non-owner users to view and edit their UserProfile name with form validation, loading states, and success/error feedback via toasts."
 }

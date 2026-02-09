@@ -1,123 +1,68 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Owner-gated admin editing UI for researcher profile content",
+  "title": "Personal Info editor for authenticated non-owner users (UserProfile name)",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Add an authenticated owner-only edit UI on the homepage to update profile, interests, publications (with optional uploads), and contact info using React Query mutations with query invalidation.",
+      "id": "REQ-1",
+      "summary": "Add an authenticated, non-owner UI to view and update the caller’s UserProfile name via existing backend functions, with success/error feedback and live UI refresh.",
       "acceptanceCriteria": [
-        "When not logged in, the UI offers a clear way to sign in with Internet Identity before editing.",
-        "When logged in but not the owner, editing controls are hidden/disabled and the UI communicates lack of permission.",
-        "When logged in as the owner, the UI provides forms to update profile fields and upload/replace an optional photo.",
-        "When logged in as the owner, the UI provides a form to add research interests.",
-        "When logged in as the owner, the UI provides a form to add publications including optional external link and optional PDF upload.",
-        "When logged in as the owner, the UI provides a form to set contact email and affiliation, and shows backend validation errors (e.g., invalid email) in a user-friendly way.",
-        "After each successful mutation, the corresponding section on the homepage updates without a full page reload."
+        "When a user is authenticated, they can open a Personal Info UI and see their current saved name (or an empty value if none exists yet).",
+        "Submitting the form calls the backend saveCallerUserProfile with the updated name and shows a success toast on completion.",
+        "After saving, subsequent reads (and any UI displaying the current user profile) reflect the updated name without a full page refresh.",
+        "If the backend rejects the call with an authorization error, the UI shows a clear error toast/message and does not crash."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/LoginButton.tsx",
+          "path": "frontend/src/components/user/PersonalInfoEditorSheet.tsx",
           "operation": "create",
-          "description": "Create a Login/Logout button using the existing useInternetIdentity hook and React Query’s queryClient.clear() on logout to clear cached data. Use English UI text. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useOwnerStatus.ts",
-          "operation": "create",
-          "description": "Add React Query hook(s) to query backend isOwner for the current caller and expose a stable owner-state for UI gating (e.g., loading/authenticated/not-owner/owner). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useMutations.ts",
-          "operation": "create",
-          "description": "Add React Query mutations for setProfile (including optional photo), addResearchInterest, addPublication (including optional PDF), and setContactInfo, and invalidate the corresponding queries (profile, researchInterests, publications, contactInfo) on success. For uploads, use the blob-storage ExternalBlob helper (e.g., ExternalBlob.fromBytes and upload progress) as required by the backend types. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/AdminEditPanel.tsx",
-          "operation": "create",
-          "description": "Create an owner-gated edit panel (e.g., dialog/drawer/accordion) that composes shadcn/ui primitives to host edit forms for profile, interests, publications, and contact info, with clear empty/loading/error states and English text. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ProfileEditForm.tsx",
-          "operation": "create",
-          "description": "Implement profile edit form (name, biography, optional photo file input) that calls the setProfile mutation. Use blob-storage ExternalBlob to wrap selected file bytes for upload and preview using getDirectURL where applicable. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-          "operation": "create",
-          "description": "Implement research interests editor to add interests using addResearchInterest mutation, showing success/error feedback, and relying on query invalidation to refresh the homepage list. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/PublicationsEditor.tsx",
-          "operation": "create",
-          "description": "Implement publications editor to add publications (title, description, optional link, optional PDF file input) using addPublication mutation. Use blob-storage ExternalBlob for PDF upload and show user-friendly mutation errors. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ContactInfoEditForm.tsx",
-          "operation": "create",
-          "description": "Implement contact info edit form (email, affiliation) calling setContactInfo mutation and render backend validation errors in a user-friendly way (no raw traps). Verify the component's usage instructions before implementing."
+          "description": "Create a Personal Info editor UI (use shadcn-ui composed components such as Sheet/Drawer, Input, Label, and Button) that reads the caller profile via useGetCallerUserProfile, allows editing only the UserProfile.name field, and saves via a dedicated mutation hook with sonner toasts for success/error. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Wire authentication and editing entry point into the existing header: add the new LoginButton and an Edit control that opens the AdminEditPanel when the caller is the owner; when authenticated but not owner, hide/disable edit actions and show a clear ‘no permission’ message. Verify the component's usage instructions before implementing."
-        },
+          "description": "Wire the PersonalInfoEditorSheet into the existing header: for authenticated non-owner users, show a visible entry point button to open the editor; optionally display the current UserProfile name in the header area when available, and ensure it updates automatically after save via React Query cache updates (no full refresh)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add React Query mutation hook for saveCallerUserProfile with invalidation of the existing ['currentUserProfile'] cache key and toast-based error surfacing.",
+      "acceptanceCriteria": [
+        "A mutation hook exists that calls saveCallerUserProfile and invalidates the ['currentUserProfile'] query on success.",
+        "Errors from the mutation are surfaced to the user via the existing toast system (sonner)."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/pages/HomePage.tsx",
+          "path": "frontend/src/hooks/useMutations.ts",
           "operation": "modify",
-          "description": "Wire the AdminEditPanel into the homepage render tree so it is reachable from the Header Edit control and shares the same data sources (useProfile/useResearchInterests/usePublications/useContactInfo) that refresh via query invalidation after mutations. Verify the component's usage instructions before implementing."
+          "description": "Add a React Query mutation hook (e.g., useSaveCallerUserProfile) that calls actor.saveCallerUserProfile({ name }), shows a success toast on completion, and invalidates the ['currentUserProfile'] query key; on error, surface the message via sonner (including clear messaging for authorization failures)."
         },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Keep existing public queries intact and add any minimal supporting query (if needed) for owner gating (prefer a dedicated hook file, but allow re-export here for consistency). Ensure queries remain enabled/disabled appropriately based on actor readiness. Verify the component's usage instructions before implementing."
+          "description": "Confirm/align the caller UserProfile query hook to use the existing query key ['currentUserProfile'] and correct actor dependency gating (enabled only when the actor is ready), so invalidation triggers immediate refetch without UI flash."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Add owner-only UI controls to remove interests/publications and to remove/replace uploaded photo/PDF blobs, updating the homepage via React Query invalidation.",
+      "summary": "Expose a non-owner authenticated entry point to Personal Info editing while keeping the owner-only Admin Edit panel access unchanged.",
       "acceptanceCriteria": [
-        "Owner can delete a research interest and it no longer appears on the homepage.",
-        "Owner can delete a publication and it no longer appears on the homepage.",
-        "Owner can replace or remove the profile photo; the rendered hero photo updates accordingly.",
-        "Owner can replace or remove a publication PDF; the rendered publication card updates accordingly.",
-        "All new write methods are protected by the same owner-only authorization as existing write methods."
+        "When logged in as a non-owner, the user has a visible way to open the Personal Info editor (e.g., from the header near the login button).",
+        "When logged out, the Personal Info editor entry point is hidden or disabled.",
+        "The existing owner-only Edit panel behavior remains unchanged (only owners see the Edit button and can open AdminEditPanel)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useMutations.ts",
+          "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Add React Query mutations for deleteResearchInterest, deletePublication, updatePublication, and profile/publication blob removal flows (setProfile with null photo; updatePublication with null pdf), and invalidate researchInterests/publications/profile queries on success. Use blob-storage ExternalBlob helpers for replacement uploads and rely on backend’s ExternalBlob for rendering via getDirectURL. Verify the component's usage instructions before implementing."
+          "description": "Update conditional rendering in the header to: (1) keep the existing owner-only Admin Edit button exactly as-is, (2) add a separate Personal Info editor entry point visible only when authenticated AND not owner, and (3) hide/disable that entry point when logged out."
         },
         {
-          "path": "frontend/src/components/admin/ProfileEditForm.tsx",
+          "path": "frontend/src/components/user/PersonalInfoEditorSheet.tsx",
           "operation": "modify",
-          "description": "Add owner controls to remove the current profile photo (submitting null) and replace it via file upload; ensure the HeroSection reflects changes via profile query invalidation. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-          "operation": "modify",
-          "description": "Add per-interest delete controls calling deleteResearchInterest and ensure the research interests section updates immediately via query invalidation. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/PublicationsEditor.tsx",
-          "operation": "modify",
-          "description": "Add per-publication delete controls (deletePublication) and PDF remove/replace controls (updatePublication with null/new ExternalBlob). Ensure the PublicationsSection updates via query invalidation. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/PublicationsSection.tsx",
-          "operation": "modify",
-          "description": "Ensure publication cards correctly reflect removed/replaced PDFs (e.g., hide download button when pdf is absent) after query invalidation-driven updates; keep public read-only browsing unchanged. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Ensure hero photo rendering correctly reflects removed/replaced photo blobs (fallback when none) after profile query invalidation-driven updates; keep public read-only browsing unchanged. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/AdminEditPanel.tsx",
-          "operation": "modify",
-          "description": "Expose the new maintenance actions in the admin panel (delete interest/publication, remove/replace photo/PDF) and ensure actions are only visible/enabled for owner. Verify the component's usage instructions before implementing."
+          "description": "Ensure the editor component supports being mounted from the header with controlled open/close state and behaves correctly when the user is unauthenticated (no crashes; UI should not be reachable via header when logged out). Verify the component's usage instructions before implementing."
         }
       ]
     }

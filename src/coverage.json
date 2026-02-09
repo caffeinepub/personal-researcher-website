@@ -1,113 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T14:04:58.266Z",
+  "generatedAt": "2026-02-08T09:11:04.119Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 2,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add canister-level access control so only a single owner (Internet Identity principal) can modify profile data (setProfile, addResearchInterest, addPublication, setContactInfo, clearData). The first successful write should set the owner if none exists; subsequent writes must reject non-owner callers with a clear error message. Add a query method to check whether the current caller is the owner (for frontend gating).",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Add a logged-in user experience that allows an authenticated (non-owner) user to view and update their own personal information stored as the backend UserProfile (currently: name) by calling getCallerUserProfile and saveCallerUserProfile.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/user/PersonalInfoEditorSheet.tsx",
+          "frontend/src/components/Header.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/user/PersonalInfoEditorSheet.tsx",
+          "frontend/src/components/Header.tsx"
+        ]
       },
       {
         "id": "REQ-2",
-        "summary": "Implement an authenticated \"Edit\" experience in the frontend that lets the owner add/update: (1) profile name, biography, and optional photo upload; (2) research interests; (3) publications (title, description, optional external link, optional PDF upload); (4) contact info (email, affiliation). Use React Query mutations and invalidate the existing queries (profile, researchInterests, publications, contactInfo) after successful updates so the homepage reflects changes immediately.",
+        "summary": "Implement React Query hooks to fetch and mutate the caller's UserProfile, including cache invalidation for the existing query key used for the current user profile.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/LoginButton.tsx",
-          "frontend/src/hooks/useOwnerStatus.ts",
           "frontend/src/hooks/useMutations.ts",
-          "frontend/src/components/admin/AdminEditPanel.tsx",
-          "frontend/src/components/admin/ProfileEditForm.tsx",
-          "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-          "frontend/src/components/admin/PublicationsEditor.tsx",
-          "frontend/src/components/admin/ContactInfoEditForm.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/pages/HomePage.tsx",
           "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/LoginButton.tsx",
-          "frontend/src/hooks/useOwnerStatus.ts",
-          "frontend/src/hooks/useMutations.ts",
-          "frontend/src/components/admin/AdminEditPanel.tsx",
-          "frontend/src/components/admin/ProfileEditForm.tsx",
-          "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-          "frontend/src/components/admin/PublicationsEditor.tsx",
-          "frontend/src/components/admin/ContactInfoEditForm.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/pages/HomePage.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/hooks/useMutations.ts"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Add basic content management capabilities needed for ongoing maintenance: allow the owner to remove individual research interests and publications, and to delete/replace uploaded blobs (photo/PDF) from the UI. Add the necessary backend methods (deleteResearchInterest, deletePublication, and updatePublication/updateProfile variants as needed) and connect them to the frontend.",
+        "summary": "Expose entry points in the existing UI to access the Personal Info editor for authenticated users who are not the portfolio owner, without granting access to the owner-only Admin Edit panel.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useMutations.ts",
-          "frontend/src/components/admin/ProfileEditForm.tsx",
-          "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-          "frontend/src/components/admin/PublicationsEditor.tsx",
-          "frontend/src/components/PublicationsSection.tsx",
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/components/admin/AdminEditPanel.tsx"
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/user/PersonalInfoEditorSheet.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useMutations.ts",
-          "frontend/src/components/admin/ProfileEditForm.tsx",
-          "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-          "frontend/src/components/admin/PublicationsEditor.tsx",
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/components/admin/AdminEditPanel.tsx"
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/user/PersonalInfoEditorSheet.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/authorization/MixinAuthorization.mo",
-    "backend/authorization/access-control.mo",
     "backend/main.mo",
     "build-request.json",
-    "build-template/Dockerfile",
-    "build-template/LICENSE",
-    "build-template/README.md",
-    "build-template/deploy.sh",
-    "build-template/icp.yaml",
-    "build-template/src/backend/canister.yaml",
-    "build-template/src/frontend/canister.yaml",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
     "frontend/src/components/Header.tsx",
-    "frontend/src/components/HeroSection.tsx",
-    "frontend/src/components/LoginButton.tsx",
-    "frontend/src/components/admin/AdminEditPanel.tsx",
-    "frontend/src/components/admin/ContactInfoEditForm.tsx",
-    "frontend/src/components/admin/ProfileEditForm.tsx",
-    "frontend/src/components/admin/PublicationsEditor.tsx",
-    "frontend/src/components/admin/ResearchInterestsEditor.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/components/user/PersonalInfoEditorSheet.tsx",
     "frontend/src/hooks/useMutations.ts",
-    "frontend/src/hooks/useOwnerStatus.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

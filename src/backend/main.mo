@@ -82,6 +82,7 @@ actor {
 
   // User profile management required by authorization system
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    // Authorization check: Only authenticated users (not guests) can access their own profile
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can access profiles");
     };
@@ -89,6 +90,7 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    // Authorization check: Users can only view their own profile, admins can view any profile
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
@@ -96,6 +98,7 @@ actor {
   };
 
   public shared ({ caller }) func saveCallerUserProfile(userProfile : UserProfile) : async () {
+    // Authorization check: Only authenticated users (not guests) can save their profile
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can save profiles");
     };

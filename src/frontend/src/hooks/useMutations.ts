@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { ExternalBlob } from '@/backend';
+import { ExternalBlob, UserProfile } from '@/backend';
 import { toast } from 'sonner';
 
 export function useSetProfile() {
@@ -163,6 +163,30 @@ export function useSetContactInfo() {
     onError: (error: any) => {
       const message = error.message || 'Failed to update contact information';
       toast.error(message);
+    },
+  });
+}
+
+export function useSaveCallerUserProfile() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userProfile: UserProfile) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.saveCallerUserProfile(userProfile);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      toast.success('Personal information updated successfully');
+    },
+    onError: (error: any) => {
+      const message = error.message || 'Failed to update personal information';
+      if (message.includes('Unauthorized') || message.includes('Access denied')) {
+        toast.error('You do not have permission to update this information');
+      } else {
+        toast.error(message);
+      }
     },
   });
 }

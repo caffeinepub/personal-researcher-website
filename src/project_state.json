@@ -1,22 +1,30 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "User wants to add personal information content (name, publications, etc.) to a live/deployed site/app.",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-implement-an-authenticated-edit-experience-in-the-frontend-that-lets-the-owner-add-update-1-profile-name-biography-and-optional-photo-upload-2-research-interests-3-publications-title-description-optional-external-link-optional-pdf-upload-4-contact-info-email-affiliation-use-react-query-mutations-and-invalidate-the-existing-queries-profile-researchinterests-publications-contactinfo-after-successful-updates-so-the-homepage-reflects-changes-immediately",
-      "title": "Implement an authenticated \"Edit\" experience in the frontend that lets the owner add/update: (1) profile name, biography, and optional photo upload; (2) research interests; (3) publications (title, description, optional external link, optional PDF upload); (4) contact info (email, affiliation). Use React Query mutations and invalidate the existing queries (profile, researchInterests, publications, contactInfo) after successful updates so the homepage reflects changes immediately.",
+      "id": "feature-add-a-logged-in-user-experience-that-allows-an-authenticated-non-owner-user-to-view-and-update-their-own-personal-information-stored-as-the-backend-userprofile-currently-name-by-calling-getcalleruserprofile-and-savecalleruserprofile",
+      "title": "Add a logged-in user experience that allows an authenticated (non-owner) user to view and update their own personal information stored as the backend UserProfile (currently: name) by calling getCallerUserProfile and saveCallerUserProfile.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-react-query-hooks-to-fetch-and-mutate-the-caller-s-userprofile-including-cache-invalidation-for-the-existing-query-key-used-for-the-current-user-profile",
+      "title": "Implement React Query hooks to fetch and mutate the caller's UserProfile, including cache invalidation for the existing query key used for the current user profile.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-basic-content-management-capabilities-needed-for-ongoing-maintenance-allow-the-owner-to-remove-individual-research-interests-and-publications-and-to-delete-replace-uploaded-blobs-photo-pdf-from-the-ui-add-the-necessary-backend-methods-deleteresearchinterest-deletepublication-and-updatepublication-updateprofile-variants-as-needed-and-connect-them-to-the-frontend",
-      "title": "Add basic content management capabilities needed for ongoing maintenance: allow the owner to remove individual research interests and publications, and to delete/replace uploaded blobs (photo/PDF) from the UI. Add the necessary backend methods (deleteResearchInterest, deletePublication, and updatePublication/updateProfile variants as needed) and connect them to the frontend.",
+      "id": "feature-expose-entry-points-in-the-existing-ui-to-access-the-personal-info-editor-for-authenticated-users-who-are-not-the-portfolio-owner-without-granting-access-to-the-owner-only-admin-edit-panel",
+      "title": "Expose entry points in the existing UI to access the Personal Info editor for authenticated users who are not the portfolio owner, without granting access to the owner-only Admin Edit panel.",
       "reqIds": [
         "REQ-3"
       ],
@@ -26,20 +34,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add editable personal profile content to the site/app (e.g., name, publications, and related sections).",
+      "summary": "Allow user to update personal information",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Add canister-level access control so only a single owner (Internet Identity principal) can modify profile data (setProfile, addResearchInterest, addPublication, setContactInfo, clearData). The first successful write should set the owner if none exists; subsequent writes must reject non-owner callers with a clear error message. Add a query method to check whether the current caller is the owner (for frontend gating).",
-      "reqIds": [
-        "REQ-1"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "Add editable admin UI for researcher name, publications, interests, and contact info",
+  "projectName": "Add UI to update logged-in user's personal info (UserProfile)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

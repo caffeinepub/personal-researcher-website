@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { Moon, Sun, Edit } from 'lucide-react';
+import { Moon, Sun, Edit, User } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import LoginButton from './LoginButton';
 import AdminEditPanel from './admin/AdminEditPanel';
+import PersonalInfoEditorSheet from './user/PersonalInfoEditorSheet';
 import { useOwnerStatus } from '@/hooks/useOwnerStatus';
+import { useGetCallerUserProfile } from '@/hooks/useQueries';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const { isOwner, isAuthenticated, isLoading } = useOwnerStatus();
+  const { data: userProfile } = useGetCallerUserProfile();
   const [editPanelOpen, setEditPanelOpen] = useState(false);
+  const [personalInfoOpen, setPersonalInfoOpen] = useState(false);
+
+  const showPersonalInfoButton = isAuthenticated && !isOwner;
 
   return (
     <>
@@ -55,6 +61,17 @@ export default function Header() {
                 Edit
               </Button>
             )}
+            {showPersonalInfoButton && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPersonalInfoOpen(true)}
+                className="gap-2"
+              >
+                <User className="h-4 w-4" />
+                {userProfile?.name || 'Profile'}
+              </Button>
+            )}
             <LoginButton />
             <Button
               variant="ghost"
@@ -81,6 +98,7 @@ export default function Header() {
         )}
       </header>
       <AdminEditPanel open={editPanelOpen} onOpenChange={setEditPanelOpen} />
+      <PersonalInfoEditorSheet open={personalInfoOpen} onOpenChange={setPersonalInfoOpen} />
     </>
   );
 }
